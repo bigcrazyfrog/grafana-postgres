@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: project_name__postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - iris
+
+  grafana:
+    container_name: project_name__grafana
+    build: grafana/
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - iris
+
+volumes:
+  postgres_data:
+  grafana_data:
+
+networks:
+  iris:
+    driver: bridge

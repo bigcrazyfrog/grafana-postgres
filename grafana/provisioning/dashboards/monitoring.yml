@@ -1,0 +1,8 @@
+- name: 'monitoring'
+  orgId: 1
+  folder: 'monitoring'
+  type: file
+  disableDeletion: false
+  editable: true
+  options:
+    path: /var/lib/grafana/dashboards/
