@@ -1,0 +1,18 @@
+- name: set up nginx
+  hosts: all
+  tasks: 
+    - name: ensure nginx is at the latest version
+      apt:
+        name: nginx
+        state: latest
+  
+    - name: remove default nginx configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+        
+    - name: start nginx service
+      service: 
+        name: nginx
+        state: started
+        enabled: yes

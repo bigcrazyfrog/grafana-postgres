@@ -1,0 +1,50 @@
+- name: run service
+  hosts: all
+  become: yes
+
+  vars:
+    project_name: grafana-postgres
+    project_path: ~/projects/grafana-postgres
+
+  tasks:
+  - name: add nginx configuration
+    copy:
+      src: ./nginx.conf
+      dest: /etc/nginx/sites-available/{{ project_name }}.conf
+      mode: "0644"
+
+  - name: enable website configuration
+    file:
+      src: /etc/nginx/sites-available/{{ project_name }}.conf
+      dest: /etc/nginx/sites-enabled/{{ project_name }}.conf
+      state: link
+
+  - name: restart nginx
+    service: 
+      name: nginx 
+      state: restarted 
+      enabled: yes
+  
+  - name: ensures {{ project_path }} dir exists
+    file: 
+      path: "{{ project_path }}"
+      state: directory
+
+  - name: copy application files
+    copy:
+      src: ./{{ item }}
+      dest: "{{ project_path }}/"
+    loop:
+    - .env
+    - docker-compose.yml
+    - grafana
+
+  - name: run container
+    become: True
+    shell:
+      cmd: "docker compose -f {{ project_path }}/docker-compose.yml up -d"
+
+  - name: remove unused data
+    become: True
+    shell:
+      cmd: docker system prune -f
